@@ -1,0 +1,20 @@
+name: Post YouTube Short PASSit
+on:
+  push:
+    paths: ['reels/latest/**']
+  workflow_dispatch:
+jobs:
+  youtube:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install google-api-python-client google-auth google-auth-httplib2
+      - name: Upload YouTube Short
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          YT_PRIVACY: 'public'
+        run: python youtube_post.py
