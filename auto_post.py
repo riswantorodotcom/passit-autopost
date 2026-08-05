@@ -101,6 +101,12 @@ def fb_album(urls, cap):
         "message": cap, "attached_media": json.dumps(att), "access_token": TOKEN}, timeout=120).json()
     print("FB feed:", r)
 
+if os.environ.get("FB_ONLY", "").lower() in ("1", "true", "yes"):
+    print("FB_ONLY: hanya posting ke Facebook Page (Instagram dilewati)...")
+    fb_album(urls, caption)
+    print("SELESAI (FB only)")
+    sys.exit(0)
+
 print("Bikin item container Instagram...")
 child = []
 for u in urls:
