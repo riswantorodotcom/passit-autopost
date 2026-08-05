@@ -1,0 +1,36 @@
+name: Post Reel PASSit
+
+on:
+  push:
+    paths:
+      - 'reels/latest/**'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Uji tanpa publish (true/false)'
+        required: false
+        default: 'false'
+      fb_only:
+        description: 'Hanya Facebook Page (true/false)'
+        required: false
+        default: 'false'
+
+jobs:
+  post_reel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - name: Post Reel ke Instagram + Facebook
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          PAGE_ACCESS_TOKEN: ${{ secrets.PAGE_ACCESS_TOKEN }}
+          PAGE_ID: ${{ secrets.PAGE_ID }}
+          POST_TO_FACEBOOK: 'true'
+          GRAPH_VERSION: 'v21.0'
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+          FB_ONLY: ${{ github.event.inputs.fb_only }}
+        run: python auto_post_reel.py
