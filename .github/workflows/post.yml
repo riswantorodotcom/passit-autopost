@@ -1,0 +1,31 @@
+name: Post carousel PASSit
+
+on:
+  push:
+    paths:
+      - 'latest/**'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Uji tanpa publish (true/false)'
+        required: false
+        default: 'false'
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - name: Post ke Instagram + Facebook
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          PAGE_ACCESS_TOKEN: ${{ secrets.PAGE_ACCESS_TOKEN }}
+          PAGE_ID: ${{ secrets.PAGE_ID }}
+          POST_TO_FACEBOOK: 'true'
+          GRAPH_VERSION: 'v21.0'
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: python auto_post.py
