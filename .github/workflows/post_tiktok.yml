@@ -1,7 +1,7 @@
-name: Post TikTok PASSit
+name: Post TikTok PASSit (MANUAL / parked)
+# Di-park: TIDAK jalan otomatis. Wawan upload manual dulu.
+# Aktifkan lagi nanti dengan menambah trigger push paths ['reels/latest/**'].
 on:
-  push:
-    paths: ['reels/latest/**']
   workflow_dispatch:
 jobs:
   tiktok:
