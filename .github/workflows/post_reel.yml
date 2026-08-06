@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install requests
-      - name: Post Reel ke Instagram + Facebook
+      - name: Post Reel ke Instagram + Facebook (dengan auto-retry)
         env:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           PAGE_ACCESS_TOKEN: ${{ secrets.PAGE_ACCESS_TOKEN }}
@@ -33,4 +33,39 @@ jobs:
           GRAPH_VERSION: 'v21.0'
           DRY_RUN: ${{ github.event.inputs.dry_run }}
           FB_ONLY: ${{ github.event.inputs.fb_only }}
-        run: python auto_post_reel.py
+          # MARKER berbasis SHA -> sama di semua percobaan dalam runner ini,
+          # jadi retter di bawah TIDAK akan double-post kalau publish sudah sukses.
+          PUBLISH_MARKER: /tmp/passit_reel_pub_${{ github.sha }}.done
+        run: |
+          set +e
+          for i in 1 2 3; do
+            echo "==================== ATTEMPT $i / 3 ===================="
+            python auto_post_reel.py
+            code=$?
+            if [ $code -eq 0 ]; then
+              echo "Attempt $i sukses."
+              exit 0
+            fi
+            echo "Attempt $i gagal (exit $code)."
+            if [ $i -lt 3 ]; then
+              echo "Tunggu 30 detik sebelum coba lagi..."
+              sleep 30
+            fi
+          done
+          echo "Semua percobaan gagal."
+          exit 1
+      - name: Beri tahu kalau GAGAL (Telegram)
+        if: failure()
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TG_TOKEN" ] || [ -z "$TG_CHAT" ]; then
+            echo "Secret TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID belum diset -> lewati notifikasi."
+            exit 0
+          fi
+          RUN_URL="https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          MSG=$'\xE2\x9A\xA0\xEF\xB8\x8F PASSit Reel GAGAL publish setelah 3x percobaan.\nCommit: '"${GITHUB_SHA:0:8}"$'\nCek log: '"${RUN_URL}"
+          curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode chat_id="${TG_CHAT}" \
+            --data-urlencode text="${MSG}" >/dev/null || echo "Gagal kirim Telegram (diabaikan)."
