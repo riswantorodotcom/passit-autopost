@@ -34,7 +34,7 @@ jobs:
           DRY_RUN: ${{ github.event.inputs.dry_run }}
           FB_ONLY: ${{ github.event.inputs.fb_only }}
           # MARKER berbasis SHA -> sama di semua percobaan dalam runner ini,
-          # jadi retter di bawah TIDAK akan double-post kalau publish sudah sukses.
+          # jadi retry di bawah TIDAK akan double-post kalau publish sudah sukses.
           PUBLISH_MARKER: /tmp/passit_reel_pub_${{ github.sha }}.done
         run: |
           set +e
@@ -54,18 +54,42 @@ jobs:
           done
           echo "Semua percobaan gagal."
           exit 1
-      - name: Beri tahu kalau GAGAL (Telegram)
+
+      - name: Kabar baik kalau SUKSES (Telegram)
+        if: success()
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: |
+          if [ -z "$TG_TOKEN" ] || [ -z "$TG_CHAT" ]; then
+            echo "Secret Telegram belum diset -> lewati notifikasi."; exit 0
+          fi
+          HOOK=$(head -n 1 reels/latest/caption.txt 2>/dev/null | cut -c1-140)
+          RUN_URL="https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          DR=$(printf '%s' "$DRY_RUN" | tr '[:upper:]' '[:lower:]')
+          if [ "$DR" = "true" ]; then
+            INTRO='\xF0\x9F\x8C\xB1 Halo Wawan! Uji coba PASSit berjalan mulus (mode dry-run, jadi belum dipublish). Semua jalur aman, tinggal jadwal harian yang bekerja. Semangat ya! \xF0\x9F\x98\x8A'
+          else
+            INTRO='\xF0\x9F\x8E\x89 Halo Wawan! Kabar baik: Reel PASSit hari ini sudah tayang di Instagram & Facebook. Terima kasih sudah konsisten menemani teman-teman pelajar belajar. Semoga harimu menyenangkan! \xF0\x9F\x8C\xBB'
+          fi
+          MSG=$(printf '%b\n\n\xF0\x9F\x93\x8C Topik: %s\n\xF0\x9F\x94\x97 %s' "$INTRO" "$HOOK" "$RUN_URL")
+          curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode chat_id="${TG_CHAT}" \
+            --data-urlencode text="${MSG}" >/dev/null || echo "Gagal kirim Telegram (diabaikan)."
+
+      - name: Kabar lembut kalau GAGAL (Telegram)
         if: failure()
         env:
           TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           if [ -z "$TG_TOKEN" ] || [ -z "$TG_CHAT" ]; then
-            echo "Secret TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID belum diset -> lewati notifikasi."
-            exit 0
+            echo "Secret Telegram belum diset -> lewati notifikasi."; exit 0
           fi
           RUN_URL="https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-          MSG=$'\xE2\x9A\xA0\xEF\xB8\x8F PASSit Reel GAGAL publish setelah 3x percobaan.\nCommit: '"${GITHUB_SHA:0:8}"$'\nCek log: '"${RUN_URL}"
+          INTRO='\xF0\x9F\x99\x8F Halo Wawan, maaf ya \xE2\x80\x94 Reel PASSit hari ini belum berhasil tayang setelah 3x percobaan. Tenang, kontennya aman dan tidak hilang, cuma perlu dicek sebentar. Kemungkinan token Meta perlu diperbarui. \xF0\x9F\x92\x9B'
+          MSG=$(printf '%b\n\nCommit: %s\nCek log: %s' "$INTRO" "${GITHUB_SHA:0:8}" "$RUN_URL")
           curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
             --data-urlencode chat_id="${TG_CHAT}" \
             --data-urlencode text="${MSG}" >/dev/null || echo "Gagal kirim Telegram (diabaikan)."
