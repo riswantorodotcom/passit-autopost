@@ -1,7 +1,16 @@
-Orang biasa bisa hafal 72 kata acak, urut, tanpa nge-blank. Bukan bakat — triknya namanya Istana Memori (method of loci): tiap info kamu "titip" di sudut ruang yang udah kamu hafal (pintu, sofa, meja), lalu tinggal jalan-jalan mental buat manggil lagi. Otak kita emang jago banget inget TEMPAT, jadi info numpang di situ biar gak buyar.
+Coba deh: nomor HP kamu yang 12 digit hafal di luar kepala. Tapi giliran disuruh hafal 12 angka acak — nyerah dalam 5 detik. Kok bisa gitu?
 
-Risetnya nyata: setelah 6 minggu latihan, peserta yang tadinya cuma inget ~26 kata naik ke ~62 dari 72 kata — dan efeknya masih nempel 4 bulan kemudian tanpa latihan lagi.
+Jawabannya bukan karena otakmu lemot. "RAM" ingatan jangka pendek kita emang kecil — riset nunjukin kapasitas murninya cuma sekitar 4 potongan info (Cowan, 2001), dan paling banter 7 kalau pakai trik (Miller, 1956).
 
-Save dulu, cobain pas ngapalin materi yang harus urut (tahapan, daftar, rumus).
+Rahasianya satu kata: CHUNKING. Nomor HP gampang karena otomatis kamu pecah jadi blok — 0812 / 3456 / 789 — jadi otak cuma megang 3 "gerombolan", bukan 12 angka lepas. 12 angka acak susah karena kamu maksa hafal 12 satuan sekaligus, jauh di atas kapasitas.
 
-#belajar #tipsbelajar #istanamemori #methodofloci #caramenghafal #belajarefektif #pelajarindonesia #sma #smp #ujian
+Cara pakainya buat belajar:
+1) Jangan hafal daftar panjang satu-satu. Kelompokin jadi 3-4 blok bermakna.
+2) Kasih "label" tiap blok (tema, singkatan, pola) biar tiap blok jadi satu chunk.
+3) Rumus/tanggal/kosakata: pecah pakai pola yang udah kamu kenal, bukan urutan mentah.
+
+Yang bikin orang jago hafal bukan RAM gede — tapi jago mecah info jadi chunk yang lebih besar. Ini strategi, bukan bakat.
+
+Save biar inget pas lagi ngafal rumus atau kosakata numpuk. 📌
+
+#belajarefektif #tipsbelajar #chunking #carabelajar #anaksekolah #smp #sma #ujian #tipsujian #belajarpintar #studygram #studywithme
